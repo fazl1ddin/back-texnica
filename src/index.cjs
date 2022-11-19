@@ -7,14 +7,9 @@ const app = new App()
 
 const router = new Router()
 
-// routes.forEach(element => {
-//     router[element.method](element.path, element.arrow)
-// });
-
-router.post('/add-user', (req, res) => {
-    console.log(req);
-    res.end(req.body)
-})
+routes.forEach(element => {
+    router[element.method](element.path, element.arrow)
+});
 
 app.addRouter(router)
 
