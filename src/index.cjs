@@ -1,4 +1,5 @@
 const routes = require('./router/routes.cjs')
+const { connect } = require('./store/index.cjs')
 
 const App = require('./app/index.cjs')
 const Router = require('./router/index.cjs')
@@ -7,10 +8,15 @@ const app = new App()
 
 const router = new Router()
 
-routes.forEach(element => {
-    router[element.method](element.path, element.arrow)
-});
+connect().then(() => {
+    routes.forEach(element => {
+        router[element.method](element.path, element.arrow)
+    });
 
-app.addRouter(router)
+    app.addRouter(router)
 
-app.listen()
+    app.listen()
+}).catch(e => {
+    console.error(e);
+})
+
