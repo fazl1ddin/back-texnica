@@ -3,7 +3,6 @@ const { connect } = require('./store/index.cjs')
 
 const App = require('./app/index.cjs')
 const Router = require('./router/index.cjs')
-
 const app = new App()
 
 const router = new Router()

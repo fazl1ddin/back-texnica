@@ -9,9 +9,10 @@ module.exports = class Router{
         }
 
         const endpoint = this.endpoints[path]
-
         if(endpoint[method]) {
-            throw new Error(`${method} was`)
+
+            console.log(endpoint);
+            throw new Error(`${method} was on path ${path}`)
         }
 
         endpoint[method] = handler

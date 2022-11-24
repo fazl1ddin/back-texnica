@@ -32,7 +32,7 @@ module.exports = {
         },
         protection: Boolean,
         product: [
-            Buffer
+            String
         ],
         comments: [
             Number
@@ -43,5 +43,24 @@ module.exports = {
         sale: Number,
         productName: String,
         rates: Number
+    }),
+    News: new Mongoose.Schema({
+        bigContent: {
+            ftitle: String,
+            fcontent: String,
+            stitle: String,
+            scontent: String
+        },
+        title: String,
+        content: String,
+        photo: String,
+        to: String,
+        date: String
+    }),
+    Promos: new Mongoose.Schema({
+        src: String,
+        title: String,
+        content: String,
+        terms: [ String ]
     })
 }
