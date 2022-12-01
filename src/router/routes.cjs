@@ -11,5 +11,17 @@ module.exports = [
     fns.addAny('add-product', Products),
     fns.addAny('add-new', News),
     fns.addAny('add-promo', Promos),
+    {
+        method: 'post',
+        path: '/login',
+        arrow: async (req, res) => {
+            let body = ''
+            await req.on('data', chunk => {
+                body += chunk
+            })
+            console.log(body);
+            res.end(body)
+        }
+    },
     ...images,
 ]

@@ -2,8 +2,13 @@ const Mongoose = require("mongoose");
 
 module.exports = {
     Users: new Mongoose.Schema({
-        name: String,
-        password: String
+        mail: String,
+        phone: Number,
+        password: String,
+        favorites: Array,
+        cart: Array,
+        viewed: Array,
+        compare: Array
     }),
     Products: new Mongoose.Schema({
         description: {
