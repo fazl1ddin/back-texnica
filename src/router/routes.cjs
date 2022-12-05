@@ -19,8 +19,36 @@ module.exports = [
             await req.on('data', chunk => {
                 body += chunk
             })
-            console.log(body);
-            res.end(body)
+            const obj = JSON.parse(body)
+            let user;
+            if(obj.logType === 'pass'){
+                const phone = parseInt(obj.iden.replace('+', ''))
+                if(!isNaN(phone)){
+                    await Users.find({phone: phone, password: obj.password}).then(result => user = result)
+                } else {
+                    await Users.find({mail: obj.iden, password: obj.password}).then(result => user = result)
+                }
+                res.end(JSON.stringify({token, user}))
+            } else {
+
+            }
+        }
+    },
+    {
+        method: 'post',
+        path: '/sing-up',
+        arrow: async (req, res) => {
+            let body = ''
+            await req.on('data', chunk => {
+                body += chunk
+            })
+            const obj = JSON.parse(body)
+            Users.create({...obj, 
+                favorites: [],
+                cart: [],
+                viewed: [],
+                compare: [],})
+            res.end('true')
         }
     },
     ...images,
