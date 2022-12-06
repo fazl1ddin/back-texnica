@@ -1,6 +1,9 @@
 const { Users, Products, News, Promos } = require('../store/models.cjs')
 const fns = require('../app/manyFunctions.cjs')
 const images = require('../img/index.cjs')
+const jwt = require('jsonwebtoken')
+const { config } = require('dotenv')
+config()
 
 module.exports = [
     fns.getAny('users', Users),
@@ -19,16 +22,18 @@ module.exports = [
             await req.on('data', chunk => {
                 body += chunk
             })
-            const obj = JSON.parse(body)
+            const {obj, logType} = JSON.parse(body)
             let user;
-            if(obj.logType === 'pass'){
+            if(logType === 'pass'){
                 const phone = parseInt(obj.iden.replace('+', ''))
                 if(!isNaN(phone)){
-                    await Users.find({phone: phone, password: obj.password}).then(result => user = result)
+                    await Users.findOne({phone: phone, password: obj.password}).then(result => user = result)
                 } else {
-                    await Users.find({mail: obj.iden, password: obj.password}).then(result => user = result)
+                    await Users.findOne({mail: obj.iden, password: obj.password}).then(result => user = result)
                 }
-                res.end(JSON.stringify({token, user}))
+                const id = user._id.toString()
+                const token = jwt.sign({id}, process.env.SECRET_KEY, {expiresIn: '1d'})
+                res.end(JSON.stringify({token: token, user}))
             } else {
 
             }

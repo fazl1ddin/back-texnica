@@ -1,5 +1,7 @@
 const http = require('http')
 const events = require('events')
+const { config } = require('dotenv')
+config()
 
 module.exports = class App{
     constructor(){
