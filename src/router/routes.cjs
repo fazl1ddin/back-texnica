@@ -22,7 +22,7 @@ module.exports = [
             await req.on('data', chunk => {
                 body += chunk
             })
-            const {obj, logType} = JSON.parse(body)
+            const {obj, logType, token} = JSON.parse(body)
             let user;
             if(logType === 'pass'){
                 const phone = parseInt(obj.iden.replace('+', ''))
@@ -35,7 +35,10 @@ module.exports = [
                 const token = jwt.sign({id}, process.env.SECRET_KEY, {expiresIn: '1d'})
                 res.end(JSON.stringify({token: token, user}))
             } else {
-
+                if(jwt.verify(token, process.env.SECRET_KEY, {expiresIn: '1d'})){
+                    await Users.findOne({id: jwt.decode(token, {expiresIn: '1d'})}).then(result => user = result)
+                    res.end(JSON.stringify({token: token, user: user}))
+                }
             }
         }
     },
