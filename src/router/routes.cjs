@@ -37,7 +37,7 @@ module.exports = [
             } else {
                 if(jwt.verify(token, process.env.SECRET_KEY, {expiresIn: '1d'})){
                     await Users.findOne({id: jwt.decode(token, {expiresIn: '1d'})}).then(result => user = result)
-                    res.end(JSON.stringify({token: token, user: user}))
+                    res.end(JSON.stringify(user))
                 }
             }
         }
