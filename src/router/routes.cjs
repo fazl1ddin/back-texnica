@@ -35,9 +35,22 @@ module.exports = [
                 const token = jwt.sign({id}, process.env.SECRET_KEY, {expiresIn: '1d'})
                 res.end(JSON.stringify({token: token, user}))
             } else {
-                if(jwt.verify(token, process.env.SECRET_KEY, {expiresIn: '1d'})){
-                    await Users.findOne({id: jwt.decode(token, {expiresIn: '1d'})}).then(result => user = result)
-                    res.end(JSON.stringify(user))
+                try {
+                    if(jwt.verify(token, process.env.SECRET_KEY, {expiresIn: '1d'})){
+                        await Users.findOne({id: jwt.decode(token, {expiresIn: '1d'})}).then(result => user = result)
+                        res.end(JSON.stringify({user}))
+                    }
+                } catch(e){
+                    if(e.expiredAt){
+                        res.statusCode = 401
+                        res.end(JSON.stringify({
+                            message: 'token expired',
+                            date: e.expiredAt.toString()
+                        }))
+                    } else {
+                        res.statusCode = 500
+                        res.end('nepredvidennaya oshibka')
+                    }
                 }
             }
         }
