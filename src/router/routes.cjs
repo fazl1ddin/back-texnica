@@ -31,9 +31,14 @@ module.exports = [
                 } else {
                     await Users.findOne({mail: obj.iden, password: obj.password}).then(result => user = result)
                 }
-                const id = user._id.toString()
-                const token = jwt.sign({id}, process.env.SECRET_KEY, {expiresIn: '1d'})
-                res.end(JSON.stringify({token: token, user}))
+                if(user != null){
+                    const id = user._id.toString()
+                    const token = jwt.sign({id}, process.env.SECRET_KEY, {expiresIn: '1d'})
+                    res.end(JSON.stringify({token: token, user}))
+                } else {
+                    res.statusCode = 401
+                    res.end(JSON.stringify({message: 'Polzovatel ne naydyon'}))
+                }                
             } else {
                 try {
                     if(jwt.verify(token, process.env.SECRET_KEY, {expiresIn: '1d'})){
