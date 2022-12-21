@@ -37,18 +37,18 @@ module.exports = {
                 await req.on('data', chunk => {
                     body += chunk
                 })
-                if(JSON.parse(body).length > 0){
-                    let product;
-                    await model.find(...JSON.parse(body)).then(result => product = result)
-                    if(product !== null){
-                        res.end(JSON.stringify(product))
-                    } else {
-                        res.statusCode = 404
-                        res.end(JSON.stringify({message: 'product not found'}))
-                    }
+                body = JSON.parse(body)
+                if(body.length > 0){
+                    let product = [];
+                    await body.forEach(async (element, index) => {
+                        await model.findById(element)
+                        .then(result => product.push(result))
+                    })
+                    console.log(product);
+                    res.end(JSON.stringify(product))
                 } else {
                     res.statusCode = 404
-                    res.end(JSON.stringify({message: 'product not found'}))
+                    res.end(JSON.stringify({message: 'products not found'}))
                 }
             }
         }
