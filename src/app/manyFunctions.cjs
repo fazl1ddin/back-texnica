@@ -39,12 +39,12 @@ module.exports = {
                 })
                 body = JSON.parse(body)
                 if(body.length > 0){
-                    let product = [];
-                    await body.forEach(async (element, index) => {
+                    const product = [];
+                    for (let index = 0; index < body.length; index++) {
+                        const element = body[index];
                         await model.findById(element)
                         .then(result => product.push(result))
-                    })
-                    console.log(product);
+                    }
                     res.end(JSON.stringify(product))
                 } else {
                     res.statusCode = 404
