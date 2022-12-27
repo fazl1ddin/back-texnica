@@ -48,7 +48,7 @@ module.exports = {
                     res.end(JSON.stringify(product))
                 } else {
                     res.statusCode = 404
-                    res.end(JSON.stringify({message: 'product(s) not found'}))
+                    res.end(JSON.stringify({message: 'not found'}))
                 }
             }
         }
