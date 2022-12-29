@@ -10,8 +10,6 @@ module.exports = class Router{
 
         const endpoint = this.endpoints[path]
         if(endpoint[method]) {
-
-            console.log(endpoint);
             throw new Error(`${method} was on path ${path}`)
         }
 
@@ -26,8 +24,8 @@ module.exports = class Router{
         this.request('POST', path, handler)
     }
 
-    pul(path, handler){
-        this.request('PUL', path, handler)
+    put(path, handler){
+        this.request('PUT', path, handler)
     }
 
     delete(path, handler){

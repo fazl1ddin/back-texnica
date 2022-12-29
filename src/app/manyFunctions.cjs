@@ -54,6 +54,29 @@ module.exports = {
         }
     },
     updateOne(path, model){
-
+        return {
+            method: 'put',
+            path: '/' + path,
+            arrow: async (req, res) => {
+                let body = ''
+                await req.on('data', chunk => {
+                    body += chunk
+                })
+                body = JSON.parse(body)
+                let upt;
+                await model.updateOne({_id: body.id}, body.arr)
+                .then(result => upt = result)
+                if(upt.acknowledged){
+                    res.end({
+                        message: 'User succesfully updated'
+                    })
+                } else {
+                    res.statusCode = 403
+                    res.end({
+                        message: 'User update failed'
+                    })
+                }
+            }
+        }
     }
 }

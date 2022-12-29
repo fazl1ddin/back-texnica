@@ -15,6 +15,7 @@ module.exports = [
     fns.addAny('add-new', News),
     fns.addAny('add-promo', Promos),
     fns.getOne('product', Products),
+    fns.updateOne('update-user', Users),
     {
         method: 'post',
         path: '/login',

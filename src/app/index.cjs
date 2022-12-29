@@ -11,7 +11,7 @@ module.exports = class App{
 
     listen(){
         this.server.listen(process.env.PORT || 3000, process.env.HOSTNAME || 'localhost', () => {
-            console.log('server started on Port');
+            console.log('server started on Port ' + process.env.PORT || 3000);
         })
     }
 
