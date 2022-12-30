@@ -30,6 +30,8 @@ module.exports = class App{
     _createServer(){
         return http.createServer((req, res) => {
             res.setHeader('Access-Control-Allow-Origin', '*')
+            res.setHeader('Access-Control-Allow-Methods', '*')
+            res.setHeader('Access-Control-Allow-Headers', '*')
             const emitted = this.event.emit(this._getRouteMask(req.url, req.method), req, res)
             if(!emitted){
                 res.end('page not found')

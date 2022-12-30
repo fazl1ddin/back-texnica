@@ -67,14 +67,14 @@ module.exports = {
                 await model.updateOne({_id: body.id}, body.arr)
                 .then(result => upt = result)
                 if(upt.acknowledged){
-                    res.end({
+                    res.end(JSON.stringify({
                         message: 'User succesfully updated'
-                    })
+                    }))
                 } else {
                     res.statusCode = 403
-                    res.end({
+                    res.end(JSON.stringify({
                         message: 'User update failed'
-                    })
+                    }))
                 }
             }
         }
