@@ -64,8 +64,13 @@ module.exports = {
                 })
                 body = JSON.parse(body)
                 let upt;
-                await model.updateOne({_id: body.id}, body.arr)
-                .then(result => upt = result)
+                for(let i = 0; i < Object.keys(body.arr).length; i++){
+                    let data;
+                    await model.findOne({_id: body.id}).then(result => data = result)
+                    const key = Object.keys(body.arr)[i]
+                    await model.updateOne({_id: body.id}, {[key]: [...data[key], body.arr[key]]})
+                    .then(result => upt = result)
+                }
                 if(upt.acknowledged){
                     res.end(JSON.stringify({
                         message: 'User succesfully updated'
