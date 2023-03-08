@@ -38,14 +38,11 @@ module.exports = {
                     body += chunk
                 })
                 body = JSON.parse(body)
-                if(body.length > 0){
-                    const product = [];
-                    for (let index = 0; index < body.length; index++) {
-                        const element = body[index];
-                        await model.findById(element)
-                        .then(result => product.push(result))
-                    }
-                    res.end(JSON.stringify(product))
+                let result = [];
+                await model.findById(body)
+                .then(result => result = result)
+                if(result){
+                    res.end(JSON.stringify(result))
                 } else {
                     res.statusCode = 404
                     res.end(JSON.stringify({message: 'not found'}))
@@ -64,16 +61,14 @@ module.exports = {
                 })
                 body = JSON.parse(body)
                 let upt;
-                for(let i = 0; i < Object.keys(body.arr).length; i++){
-                    let data;
-                    await model.findOne({_id: body.id}).then(result => data = result)
-                    const key = Object.keys(body.arr)[i]
-                    await model.updateOne({_id: body.id}, {[key]: [...data[key], body.arr[key]]})
-                    .then(result => upt = result)
-                }
-                if(upt.acknowledged){
+                let data;
+                await model.findOne({_id: body.id}).then(result => data = result)
+                await model.findOneAndUpdate({_id: body.id}, {[body.module]: [...data[body.module], body.data]}, {new: true})
+                .then(result => upt = result)
+                if(data[body.module].length !== upt[body.module].length){
                     res.end(JSON.stringify({
-                        message: 'User succesfully updated'
+                        message: 'User succesfully updated',
+                        user: upt
                     }))
                 } else {
                     res.statusCode = 403

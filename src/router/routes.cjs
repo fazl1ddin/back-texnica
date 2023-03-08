@@ -79,5 +79,25 @@ module.exports = [
             res.end('true')
         }
     },
+    {
+        method: 'post',
+        path: '/check-module',
+        arrow: async (req, res) => {
+            let body = ''
+            await req.on('data', chunk => {
+                body += chunk
+            })
+            body = JSON.parse(body)
+            let resl;
+            await Users.findById(body.user_id)
+            .then(result => resl = result)
+            const arr = []
+            for (let index = 0; index < body.arr.length; index++) {
+                const element = body.arr[index];
+                if(resl[body.module].some((item, index) => item.id == element)) arr.push(element)
+            }
+            res.end(JSON.stringify(arr))
+        }
+    },
     ...images,
 ]
