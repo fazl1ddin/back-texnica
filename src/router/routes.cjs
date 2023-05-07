@@ -15,7 +15,6 @@ module.exports = [
     fns.addAny('add-new', News),
     fns.addAny('add-promo', Promos),
     fns.getOne('product', Products),
-    fns.updateOne('update-user', Users),
     {
         method: 'post',
         path: '/login',
@@ -80,23 +79,36 @@ module.exports = [
         }
     },
     {
-        method: 'post',
-        path: '/check-module',
+        method: 'put',
+        path: '/update-user',
         arrow: async (req, res) => {
             let body = ''
             await req.on('data', chunk => {
                 body += chunk
             })
             body = JSON.parse(body)
-            let resl;
-            await Users.findById(body.user_id)
-            .then(result => resl = result)
-            const arr = []
-            for (let index = 0; index < body.arr.length; index++) {
-                const element = body.arr[index];
-                if(resl[body.module].some((item, index) => item.id == element)) arr.push(element)
+            let upt;
+            let data;
+            await Users.findOne({_id: body.id}).then(result => data = result)
+            let arr = []
+            if(body.method === 'add'){
+                arr = [...data[body.module], body.data]
+            } else if(body.method === 'remove'){
+                arr = data[body.module].filter((item) => item.id !== body.data.id)
             }
-            res.end(JSON.stringify(arr))
+            await Users.findOneAndUpdate({_id: body.id}, {[body.module]: arr}, {new: true})
+            .then(result => upt = result)
+            if(data[body.module].length !== upt[body.module].length){
+                res.end(JSON.stringify({
+                    message: 'User succesfully updated',
+                    user: upt
+                }))
+            } else {
+                res.statusCode = 403
+                res.end(JSON.stringify({
+                    message: 'User update failed'
+                }))
+            }
         }
     },
     ...images,
