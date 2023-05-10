@@ -8,7 +8,7 @@ const app = new App()
 const router = new Router()
 
 connect().then(() => {
-    routes.forEach(element => {
+    routes.filter(item => Boolean(item)).forEach(element => {
         router[element.method](element.path, element.arrow)
     });
 
