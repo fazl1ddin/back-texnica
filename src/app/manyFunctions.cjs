@@ -39,9 +39,55 @@ module.exports = {
                 })
                 body = JSON.parse(body)
                 let result = [];
-                for (let index = 0; index < body.length; index++) {
-                    const element = body[index];
+                for (let index = 0; index < body.arr.length; index++) {
+                    const element = body.arr[index];
                     await model.findById(element).then(res => result.push(res))
+                }
+                if(body.only){
+                    function removeDuplicates(arr){
+
+                        const result = []
+                        const duplicatesIndices = []
+        
+                        arr.forEach((current, index) => {
+        
+                            if(duplicatesIndices.includes(index)) return
+        
+                            result.push(current)
+        
+                            for(let comparisonIndex = index + 1; comparisonIndex < arr.length; comparisonIndex++){
+        
+                                const comparison = arr[comparisonIndex]
+                                const currentKeys = Object.keys(current.specification)
+                                const comparisonKeys = Object.keys(comparison.specification)
+        
+                                if(currentKeys.length !== comparisonKeys.length) continue
+        
+                                const currentKeysString = currentKeys.sort().join("").toLowerCase()
+                                const comparisonKeysString = comparisonKeys.sort().join("").toLowerCase()
+        
+                                if(currentKeysString !== comparisonKeysString) continue
+        
+                                const comparison1 = arr[comparisonIndex]
+        
+                                let valuesEqual = true
+                                for(let i = 0; i < currentKeys.length; i++){
+                                    const key = currentKeys[i]
+                                    if(
+                                        current.price !== comparison1.price ||
+                                        current.productName !== comparison1.productName){
+                                        valuesEqual = false
+                                        break
+                                    }
+                                }
+        
+                                if(valuesEqual) duplicatesIndices.push(comparisonIndex)
+        
+                            }
+                        })
+                        return result
+                    }
+                    result = removeDuplicates(result)
                 }
                 if(result){
                     res.end(JSON.stringify(result))
