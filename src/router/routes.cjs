@@ -11,9 +11,6 @@ module.exports = [
     fns.getAny('news', News),
     fns.getAny('promos', Promos),
     fns.addAny('add-user', Users),
-    fns.addAny('add-product', Products),
-    fns.addAny('add-new', News),
-    fns.addAny('add-promo', Promos),
     fns.getOne('product', Products),
     {
         method: 'post',
