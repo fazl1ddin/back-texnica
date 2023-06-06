@@ -1,4 +1,4 @@
-const { Users, Products, News, Promos } = require('../store/models.cjs')
+const { Users, Products, News, Promos, Customs } = require('../store/models.cjs')
 const fns = require('../app/manyFunctions.cjs')
 const images = require('../img/index.cjs')
 const jwt = require('jsonwebtoken')
@@ -105,6 +105,47 @@ module.exports = [
                 res.end(JSON.stringify({
                     message: 'User update failed'
                 }))
+            }
+        }
+    },
+    {
+        method: 'get',
+        path: '/index-products',
+        arrow: async (req, res) => {
+            let result = await Customs.find({}).then(res => res[0]?.indexP)
+            if (result !== null) {
+                for (let index = 0; index < result.length; index++) {
+                    const element = result[index];
+                    let arr = []
+                    for (let i = 0; i < element.every.length; i++) {
+                        const item = element.every[i];
+                        await Products.findById(item).then(result => arr[i] = result)
+                    }
+                    result[index] = {
+                        title: element.title,
+                        href: element.href,
+                        every: arr
+                    }
+                }
+                res.end(JSON.stringify(result))
+            } else {
+                res.end('indexP hali berilmagan')
+            }
+        }
+    },
+    {
+        method: 'get',
+        path: '/get-rec',
+        arrow: async (req, res) => {
+            let result = await Customs.find({}).then(res => res[0]?.recs)
+            if (result !== null) {
+                for (let index = 0; index < result.length; index++) {
+                    const element = result[index];
+                    await Products.findById(element).then(res => result[index] = res)
+                }
+                res.end(JSON.stringify(result))
+            } else {
+                res.end('recs hali berilmagan')
             }
         }
     },

@@ -68,5 +68,18 @@ module.exports = {
         title: String,
         content: String,
         terms: [ String ]
-    })
+    }),
+    Customs: new Mongoose.Schema({
+        recs: [],
+        indexP: [
+              {
+                every: [{
+                    ...this.Products
+                }],
+                title: String,
+                href: String
+              }
+        ]
+        
+    }),
 }
