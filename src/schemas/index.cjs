@@ -48,7 +48,9 @@ module.exports = {
         price: Number,
         sale: Number,
         productName: String,
-        rates: Number
+        rates: Number,
+        space: String,
+        realPrice: String,
     }),
     News: new Mongoose.Schema({
         bigContent: {
@@ -80,6 +82,5 @@ module.exports = {
                 href: String
               }
         ]
-        
     }),
 }

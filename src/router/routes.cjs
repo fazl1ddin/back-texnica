@@ -112,6 +112,7 @@ module.exports = [
         method: 'get',
         path: '/index-products',
         arrow: async (req, res) => {
+            res.setHeader('content-type', 'application/json; charset=utf-8')
             let result = await Customs.find({}).then(res => res[0]?.indexP)
             if (result !== null) {
                 for (let index = 0; index < result.length; index++) {
@@ -121,6 +122,14 @@ module.exports = [
                         const item = element.every[i];
                         await Products.findById(item).then(result => arr[i] = result)
                     }
+                    arr = arr.map((item, index) => ({
+                            ...item,
+                            space: new Intl.NumberFormat('ru').format(item.price * item.sale / 100),
+                            realPrice: new Intl.NumberFormat('ru').format(item.price - (item.price * item.sale / 100)),
+                        })
+                    )
+                    // console.log(arr, 'arrrrrrrrr');
+                    console.log(arr);
                     result[index] = {
                         title: element.title,
                         href: element.href,
