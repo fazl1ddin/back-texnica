@@ -41,7 +41,13 @@ module.exports = {
             String
         ],
         comments: [
-            Number
+            {
+                userId: String,
+                rate: Number,
+                date: Number,
+                title: String,
+                content: String
+            }
         ],
         hit: Boolean,
         news: Boolean,

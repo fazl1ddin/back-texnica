@@ -122,14 +122,6 @@ module.exports = [
                         const item = element.every[i];
                         await Products.findById(item).then(result => arr[i] = result)
                     }
-                    arr = arr.map((item, index) => ({
-                            ...item,
-                            space: new Intl.NumberFormat('ru').format(item.price * item.sale / 100),
-                            realPrice: new Intl.NumberFormat('ru').format(item.price - (item.price * item.sale / 100)),
-                        })
-                    )
-                    // console.log(arr, 'arrrrrrrrr');
-                    console.log(arr);
                     result[index] = {
                         title: element.title,
                         href: element.href,
@@ -156,6 +148,27 @@ module.exports = [
             } else {
                 res.end('recs hali berilmagan')
             }
+        }
+    },
+    {
+        method: 'post',
+        path: '/add-comment',
+        arrow: async (req, res) => {
+            let body = ''
+            await req.on('data', chunk => {
+                body += chunk
+            })
+            body = JSON.parse(body)
+            let product = await Products.findByIdAndUpdate(body.productId, {comments: [
+                {
+                    userId: body.userId,
+                    rate: body.rate,
+                    date: Date.now(),
+                    title: body.title,
+                    content: body.content
+                }
+            ]}, {new: true})
+            res.end(JSON.stringify(product))
         }
     },
     ...images,
