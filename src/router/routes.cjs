@@ -159,16 +159,42 @@ module.exports = [
                 body += chunk
             })
             body = JSON.parse(body)
-            let product = await Products.findByIdAndUpdate(body.productId, {comments: [
-                {
-                    userId: body.userId,
-                    rate: body.rate,
-                    date: Date.now(),
-                    title: body.title,
-                    content: body.content
-                }
-            ]}, {new: true})
+            let oldProduct = await Products.findById(body.productId)
+            let sum = oldProduct.comments.reduce((p, n) => p + n.rate,0)
+            let product = await Products.findByIdAndUpdate(body.productId, {
+                rates: oldProduct.comments.length ? Math.round((sum + Number(body.rate)) / (oldProduct.comments.length + 1)) : body.rate,
+                comments: [
+                    ...oldProduct.comments,
+                    {
+                        userId: body.userId,
+                        rate: body.rate,
+                        date: Date.now(),
+                        title: body.title,
+                        content: body.content
+                    }
+                ]
+            }, {new: true})
             res.end(JSON.stringify(product))
+        }
+    },
+    {
+        method: 'post',
+        path: '/get-user-data',
+        arrow: async (req, res) => {
+            let body = ''
+            await req.on('data', chunk => {
+                body += chunk
+            })
+            body = JSON.parse(body)
+            let result = {}
+            let user = await Users.findById(body.userId)
+            for (let index = 0; index < body.keys.length; index++) {
+                const element = body.keys[index];
+                if(element !== 'password'){
+                    result[element] = user[element]
+                }
+            }
+            res.end(JSON.stringify(result))
         }
     },
     ...images,
