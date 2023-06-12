@@ -186,15 +186,20 @@ module.exports = [
                 body += chunk
             })
             body = JSON.parse(body)
-            let result = {}
-            let user = await Users.findById(body.userId)
-            for (let index = 0; index < body.keys.length; index++) {
-                const element = body.keys[index];
-                if(element !== 'password'){
-                    result[element] = user[element]
+            let arr = []
+            for (let index = 0; index < body.userId.length; index++) {
+                const element = body.userId[index];
+                let result = {}
+                let user = await Users.findById(element)
+                for (let index = 0; index < body.keys.length; index++) {
+                    const element = body.keys[index];
+                    if(element !== 'password'){
+                        result[element] = user[element]
+                    }
                 }
+                arr[index] = result
             }
-            res.end(JSON.stringify(result))
+            res.end(JSON.stringify(arr))
         }
     },
     ...images,
