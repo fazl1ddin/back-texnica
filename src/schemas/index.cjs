@@ -78,7 +78,7 @@ module.exports = {
         terms: [ String ]
     }),
     Customs: new Mongoose.Schema({
-        recs: [],
+        recs: [String],
         indexP: [
               {
                 every: [{
@@ -87,6 +87,14 @@ module.exports = {
                 title: String,
                 href: String
               }
+        ],
+        indexNews: [
+            {
+                title: String,
+                img: String,
+                href: undefined | String,
+                with: undefined | Number
+            }
         ]
     }),
 }
