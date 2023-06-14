@@ -202,5 +202,17 @@ module.exports = [
             res.end(JSON.stringify(arr))
         }
     },
+    {
+        method: 'get',
+        path: '/get-index-promos',
+        arrow: async (req, res) => {
+            let result = await Customs.find({}).then(res => res[0]?.indexPromos)
+            if (result !== null) {
+                res.end(JSON.stringify(result))
+            } else {
+                res.end('indexPromos hali berilmagan')
+            }
+        }
+    },
     ...images,
 ]

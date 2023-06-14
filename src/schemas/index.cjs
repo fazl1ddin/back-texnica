@@ -88,12 +88,12 @@ module.exports = {
                 href: String
               }
         ],
-        indexNews: [
+        indexPromos: [
             {
                 title: String,
                 img: String,
-                href: undefined | String,
-                with: undefined | Number
+                href: null | String,
+                with: null | Number
             }
         ]
     }),
