@@ -5,9 +5,37 @@ const jwt = require('jsonwebtoken')
 const { config } = require('dotenv')
 config()
 
+function removeDuplicates(arr, key){
+
+    const result = []
+    const duplicatesIndices = []
+
+    arr.forEach((current, index) => {
+
+        if(duplicatesIndices.includes(index)) return
+
+        result.push(current.specification[key])
+
+        for(let comparisonIndex = index + 1; comparisonIndex < arr.length; comparisonIndex++){
+
+            const comparison = arr[comparisonIndex]
+
+            let valuesEqual = true
+            if(current.specification[key] !== comparison.specification[key]){
+                valuesEqual = false
+                break
+            }
+
+            if(valuesEqual) duplicatesIndices.push(comparisonIndex)
+
+        }
+    })
+    return result
+}
+
 module.exports = [
     fns.getAny('users', Users),
-    fns.getAny('products', Products),
+    // fns.getAny('products', Products),
     fns.getAny('news', News),
     fns.getAny('promos', Promos),
     fns.addAny('add-user', Users),
@@ -212,6 +240,27 @@ module.exports = [
             } else {
                 res.end('indexPromos hali berilmagan')
             }
+        }
+    },
+    {
+        method: 'post',
+        path: '/products',
+        arrow: async (req, res) => {
+            let body = ''
+            await req.on('data', chunk => {
+                body += chunk
+            })
+            body = JSON.parse(body)
+            let products = await Products.find()
+            let filtersChecks = {
+                podsvetka: removeDuplicates(products, 'Круиз-контроль'),
+                moshnost: removeDuplicates(products, 'Мощность двигателя'),
+                maksSpeed: removeDuplicates(products, 'Макс. скорость до (км/ч):')
+            }
+            res.end(JSON.stringify({
+                products,
+                filtersChecks
+            }))
         }
     },
     ...images,
