@@ -43,6 +43,7 @@ module.exports = {
                     const element = body.arr[index];
                     await model.findById(element).then(res => result.push(res))
                 }
+                console.log(result);
                 if(body.only){
                     function removeDuplicates(arr){
 

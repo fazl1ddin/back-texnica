@@ -252,10 +252,15 @@ module.exports = [
             })
             body = JSON.parse(body)
             let products = await Products.find()
+            let sorted = [...products].sort((a, b) => a.price - b.price)
             let filtersChecks = {
-                podsvetka: removeDuplicates(products, 'Круиз-контроль'),
-                moshnost: removeDuplicates(products, 'Мощность двигателя'),
-                maksSpeed: removeDuplicates(products, 'Макс. скорость до (км/ч):')
+                price: {
+                    min: sorted[0].price,
+                    max: sorted[sorted.length - 1].price
+                },
+                podsvetka: removeDuplicates(products, 'cruise'),
+                moshnost: removeDuplicates(products, 'power'),
+                maksSpeed: removeDuplicates(products, 'speed')
             }
             res.end(JSON.stringify({
                 products,
