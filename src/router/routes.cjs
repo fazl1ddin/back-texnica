@@ -263,8 +263,9 @@ module.exports = [
                 maksSpeed: removeDuplicates(products, 'speed')
             }
             res.end(JSON.stringify({
-                products,
-                filtersChecks
+                products: products.slice((body.page - 1) * body.perPage, body.page * body.perPage),
+                filtersChecks,
+                allength: Math.ceil(products.length / body.perPage)
             }))
         }
     },
