@@ -32,9 +32,9 @@ module.exports = class App{
             res.setHeader('Access-Control-Allow-Origin', '*')
             res.setHeader('Access-Control-Allow-Methods', '*')
             res.setHeader('Access-Control-Allow-Headers', '*')
-            // if(!req.url.includes('/images')){
-            //     res.setHeader('Content-Type', 'application/json; charset=utf-8')
-            // }
+            if(!req.url.includes('/images')){
+                res.setHeader('Content-Type', 'application/json; charset=utf-8')
+            }
             const emitted = this.event.emit(this._getRouteMask(req.url, req.method), req, res)
             if(!emitted){
                 res.end('page not found')
