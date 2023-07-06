@@ -243,6 +243,24 @@ module.exports = [
         }
     },
     {
+        method: 'get',
+        path: '/filter-checks',
+        arrow: async (req, res) => {
+            let products = await Products.find()
+            // let sorted = [...products].sort((a, b) => a.price - b.price)
+            let filtersChecks = {
+                price: {
+                    // min: sorted[0].price,
+                    // max: sorted[sorted.length - 1].price
+                },
+                podsvetka: removeDuplicates(products, 'cruise'),
+                moshnost: removeDuplicates(products, 'power'),
+                maksSpeed: removeDuplicates(products, 'speed')
+            }
+            res.end(JSON.stringify(filtersChecks))
+        }
+    },
+    {
         method: 'post',
         path: '/products',
         arrow: async (req, res) => {
@@ -251,20 +269,25 @@ module.exports = [
                 body += chunk
             })
             body = JSON.parse(body)
-            let products = await Products.find()
-            let sorted = [...products].sort((a, b) => a.price - b.price)
-            let filtersChecks = {
-                price: {
-                    min: sorted[0].price,
-                    max: sorted[sorted.length - 1].price
-                },
-                podsvetka: removeDuplicates(products, 'cruise'),
-                moshnost: removeDuplicates(products, 'power'),
-                maksSpeed: removeDuplicates(products, 'speed')
+            let filter = {}
+            if (body.filter.podsvetka !== null) {
+                filter = {...filter, "specification.cruise": body.filter.podsvetka}
+            } else {
+                delete filter["specification.cruise"]
             }
+            if (body.filter.moshnost !== null) {
+                filter = {...filter, "specification.power": {$in: body.filter.moshnost}}
+            } else {
+                delete filter["specification.power"]
+            }
+            if (body.filter.maksSpeed !== null) {
+                filter = {...filter, "specification.speed": {$in: body.filter.podsvetka}}
+            } else {
+                delete filter["specification.speed"]
+            }
+            let products = await Products.find(filter)
             res.end(JSON.stringify({
                 products: products.slice((body.page - 1) * body.perPage, body.page * body.perPage),
-                filtersChecks,
                 allength: Math.ceil(products.length / body.perPage)
             }))
         }
