@@ -30,7 +30,7 @@ function removeDuplicates(arr, key){
 
         }
     })
-    return result
+    return [...new Set(result)]
 }
 
 module.exports = [
@@ -140,7 +140,6 @@ module.exports = [
         method: 'get',
         path: '/index-products',
         arrow: async (req, res) => {
-            res.setHeader('content-type', 'application/json; charset=utf-8')
             let result = await Customs.find({}).then(res => res[0]?.indexP)
             if (result !== null) {
                 for (let index = 0; index < result.length; index++) {
@@ -247,11 +246,11 @@ module.exports = [
         path: '/filter-checks',
         arrow: async (req, res) => {
             let products = await Products.find()
-            // let sorted = [...products].sort((a, b) => a.price - b.price)
+            let sorted = [...products].sort((a, b) => a.price - b.price)
             let filtersChecks = {
                 price: {
-                    // min: sorted[0].price,
-                    // max: sorted[sorted.length - 1].price
+                    min: sorted[0].price,
+                    max: sorted[sorted.length - 1].price
                 },
                 podsvetka: removeDuplicates(products, 'cruise'),
                 moshnost: removeDuplicates(products, 'power'),
@@ -272,24 +271,33 @@ module.exports = [
             let filter = {}
             if (body.filter.podsvetka !== null) {
                 filter = {...filter, "specification.cruise": body.filter.podsvetka}
-            } else {
-                delete filter["specification.cruise"]
             }
             if (body.filter.moshnost !== null) {
                 filter = {...filter, "specification.power": {$in: body.filter.moshnost}}
-            } else {
-                delete filter["specification.power"]
             }
             if (body.filter.maksSpeed !== null) {
                 filter = {...filter, "specification.speed": {$in: body.filter.podsvetka}}
-            } else {
-                delete filter["specification.speed"]
+            }
+            if (body.filter.prices.min && body.filter.prices.max) {
+                filter = {
+                    ...filter, "price": {
+                        $gte: body.filter.prices.min,
+                        $lte: body.filter.prices.max
+                }}
             }
             let products = await Products.find(filter)
             res.end(JSON.stringify({
                 products: products.slice((body.page - 1) * body.perPage, body.page * body.perPage),
                 allength: Math.ceil(products.length / body.perPage)
             }))
+        }
+    },
+    {
+        method: 'get',
+        path: '/address-shops',
+        arrow: async (req, res) => {
+            let result = await Customs.find({}).then(res => res[0]?.addressShops)
+            res.end(JSON.stringify(result))
         }
     },
     ...images,

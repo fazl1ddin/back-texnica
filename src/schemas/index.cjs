@@ -88,6 +88,15 @@ module.exports = {
               href: null | String,
               with: null | Number
           }
+      ],
+      addressShops: [
+        {
+          city: String,
+          street: String,
+          numberHome: Number,
+          weekdays: [Number],
+          times: [Number]
+        }
       ]
   }),
 };
