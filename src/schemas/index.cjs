@@ -89,14 +89,31 @@ module.exports = {
               with: null | Number
           }
       ],
-      addressShops: [
-        {
-          city: String,
-          street: String,
-          numberHome: Number,
-          weekdays: [Number],
-          times: [Number]
-        }
-      ]
   }),
+  AddressShops: new Mongoose.Schema({
+    city: String,
+    street: String,
+    numberHome: Number,
+    weekdays: {
+      type: [Number],
+      validate: {
+        validator: (arr) => {
+          return arr.length === 2 && arr.every(item => (item <= 7 && item > 0))
+        },
+        message: "Array length must be 2"
+      }
+    },
+    times: {
+      type: [Number],
+      validate: {
+        validator: (arr) => {
+          return arr.length === 2 && arr.every(item => (item <= 24 && item > 0))
+        },
+        message: "Array length must be 2"
+      }
+    }
+  }),
+  Cities: new Mongoose.Schema({
+    name: String
+  })
 };
