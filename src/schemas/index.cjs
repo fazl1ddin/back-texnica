@@ -33,17 +33,19 @@ module.exports = {
       charge2: Number,
       frontBrake2: String,
       cruise2: String,
-      frontBrake3: String
+      frontBrake3: String,
     },
     protection: Boolean,
     product: [String],
-    comments: [{
-      userId: String,
-      rate: Number,
-      date: Number,
-      title: String,
-      content: String
-    }],
+    comments: [
+      {
+        userId: String,
+        rate: Number,
+        date: Number,
+        title: String,
+        content: String,
+      },
+    ],
     hit: Boolean,
     news: Boolean,
     price: Number,
@@ -71,24 +73,36 @@ module.exports = {
     terms: [String],
   }),
   Customs: new Mongoose.Schema({
-      recs: [],
-      indexP: [
-            {
-              every: [{
-                  ...this.Products
-              }],
-              title: String,
-              href: String
-            }
-      ],
-      indexPromos: [
+    recs: [],
+    indexP: [
+      {
+        every: [
           {
-              title: String,
-              img: String,
-              href: null | String,
-              with: null | Number
-          }
-      ],
+            ...this.Products,
+          },
+        ],
+        title: String,
+        href: String,
+      },
+    ],
+    indexPromos: [
+      {
+        title: String,
+        img: String,
+        href: null | String,
+        with: null | Number,
+      },
+    ],
+    daysToDeliv: [Number],
+    timeToDeliv: {
+      type: [Number],
+      validate: {
+        validator: (arr) => {
+          return arr.length === 2 && arr.every((item) => item <= 24 && item > 0) && (arr[0] < arr[1])
+        },
+        message: 'Array length must be 2'
+      },
+    }
   }),
   AddressShops: new Mongoose.Schema({
     city: String,
@@ -98,22 +112,24 @@ module.exports = {
       type: [Number],
       validate: {
         validator: (arr) => {
-          return arr.length === 2 && arr.every(item => (item <= 7 && item > 0))
+          return arr.length === 2 && arr.every((item) => item <= 7 && item > 0);
         },
-        message: "Array length must be 2"
-      }
+        message: "Array length must be 2",
+      },
     },
     times: {
       type: [Number],
       validate: {
         validator: (arr) => {
-          return arr.length === 2 && arr.every(item => (item <= 24 && item > 0))
+          return (
+            arr.length === 2 && arr.every((item) => item <= 24 && item > 0)
+          );
         },
-        message: "Array length must be 2"
-      }
-    }
+        message: "Array length must be 2",
+      },
+    },
   }),
   Cities: new Mongoose.Schema({
-    name: String
-  })
+    name: String,
+  }),
 };
