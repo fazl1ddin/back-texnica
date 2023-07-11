@@ -1,12 +1,4 @@
-const {
-  Users,
-  Products,
-  News,
-  Promos,
-  Customs,
-  AddressShops,
-  Cities,
-} = require("../store/models.cjs");
+const models = require("../store/models.cjs");
 const fns = require("../app/manyFunctions.cjs");
 const images = require("../img/index.cjs");
 const jwt = require("jsonwebtoken");
@@ -42,12 +34,12 @@ function removeDuplicates(arr, key) {
 }
 
 module.exports = [
-  fns.getAny("users", Users),
-  // fns.getAny('products', Products),
-  fns.getAny("news", News),
-  fns.getAny("promos", Promos),
-  fns.addAny("add-user", Users),
-  fns.getOne("product", Products),
+  fns.getAny("users", models.Users),
+  // fns.getAny('products', models.Products),
+  fns.getAny("news", models.News),
+  fns.getAny("promos", models.Promos),
+  fns.addAny("add-user", models.Users),
+  fns.getOne("product", models.Products),
   {
     method: "post",
     path: "/login",
@@ -61,11 +53,11 @@ module.exports = [
       if (logType === "pass") {
         const phone = parseInt(obj.iden.replace("+", ""));
         if (!isNaN(phone)) {
-          await Users.findOne({ phone: phone, password: obj.password }).then(
+          await models.Users.findOne({ phone: phone, password: obj.password }).then(
             (result) => (user = result)
           );
         } else {
-          await Users.findOne({ mail: obj.iden, password: obj.password }).then(
+          await models.Users.findOne({ mail: obj.iden, password: obj.password }).then(
             (result) => (user = result)
           );
         }
@@ -82,7 +74,7 @@ module.exports = [
       } else {
         try {
           if (jwt.verify(token, process.env.SECRET_KEY, { expiresIn: "1d" })) {
-            await Users.findOne({
+            await models.Users.findOne({
               id: jwt.decode(token, { expiresIn: "1d" }),
             }).then((result) => (user = result));
             res.end(JSON.stringify({ user }));
@@ -113,7 +105,7 @@ module.exports = [
         body += chunk;
       });
       const obj = JSON.parse(body);
-      Users.create({
+      models.Users.create({
         ...obj,
         favorites: [],
         cart: [],
@@ -134,14 +126,14 @@ module.exports = [
       body = JSON.parse(body);
       let upt;
       let data;
-      await Users.findOne({ _id: body.id }).then((result) => (data = result));
+      await models.Users.findOne({ _id: body.id }).then((result) => (data = result));
       let arr = [];
       if (body.method === "add") {
         arr = [...data[body.module], body.data];
       } else if (body.method === "remove") {
         arr = data[body.module].filter((item) => item.id !== body.data.id);
       }
-      await Users.findOneAndUpdate(
+      await models.Users.findOneAndUpdate(
         { _id: body.id },
         { [body.module]: arr },
         { new: true }
@@ -167,14 +159,14 @@ module.exports = [
     method: "get",
     path: "/index-products",
     arrow: async (req, res) => {
-      let result = await Customs.find({}).then((res) => res[0]?.indexP);
+      let result = await models.Customs.find({}).then((res) => res[0]?.indexP);
       if (result !== null) {
         for (let index = 0; index < result.length; index++) {
           const element = result[index];
           let arr = [];
           for (let i = 0; i < element.every.length; i++) {
             const item = element.every[i];
-            await Products.findById(item).then((result) => (arr[i] = result));
+            await models.Products.findById(item).then((result) => (arr[i] = result));
           }
           result[index] = {
             title: element.title,
@@ -192,11 +184,11 @@ module.exports = [
     method: "get",
     path: "/get-rec",
     arrow: async (req, res) => {
-      let result = await Customs.find({}).then((res) => res[0]?.recs);
+      let result = await models.Customs.find({}).then((res) => res[0]?.recs);
       if (result !== null) {
         for (let index = 0; index < result.length; index++) {
           const element = result[index];
-          await Products.findById(element).then((res) => (result[index] = res));
+          await models.Products.findById(element).then((res) => (result[index] = res));
         }
         res.end(JSON.stringify(result));
       } else {
@@ -213,9 +205,9 @@ module.exports = [
         body += chunk;
       });
       body = JSON.parse(body);
-      let oldProduct = await Products.findById(body.productId);
+      let oldProduct = await models.Products.findById(body.productId);
       let sum = oldProduct.comments.reduce((p, n) => p + n.rate, 0);
-      let product = await Products.findByIdAndUpdate(
+      let product = await models.Products.findByIdAndUpdate(
         body.productId,
         {
           rates: oldProduct.comments.length
@@ -252,7 +244,7 @@ module.exports = [
       for (let index = 0; index < body.userId.length; index++) {
         const element = body.userId[index];
         let result = {};
-        let user = await Users.findById(element);
+        let user = await models.Users.findById(element);
         for (let index = 0; index < body.keys.length; index++) {
           const element = body.keys[index];
           if (element !== "password") {
@@ -268,7 +260,7 @@ module.exports = [
     method: "get",
     path: "/get-index-promos",
     arrow: async (req, res) => {
-      let result = await Customs.find({}).then((res) => res[0]?.indexPromos);
+      let result = await models.Customs.find({}).then((res) => res[0]?.indexPromos);
       if (result !== null) {
         res.end(JSON.stringify(result));
       } else {
@@ -280,7 +272,7 @@ module.exports = [
     method: "get",
     path: "/filter-checks",
     arrow: async (req, res) => {
-      let products = await Products.find();
+      let products = await models.Products.find();
       let sorted = [...products].sort((a, b) => a.price - b.price);
       let filtersChecks = {
         price: {
@@ -328,7 +320,7 @@ module.exports = [
           },
         };
       }
-      let products = await Products.find(filter);
+      let products = await models.Products.find(filter);
       res.end(
         JSON.stringify({
           products: products.slice(
@@ -340,7 +332,8 @@ module.exports = [
       );
     },
   },
-  fns.getAny("cities", Cities),
+  fns.getAny("cities", models.Cities),
+  fns.getAny("days-deliv", models.DaysToDeliv),
   {
     method: "post",
     path: "/address-shops",
@@ -350,7 +343,7 @@ module.exports = [
         body += chunk;
       });
       body = JSON.parse(body);
-      let result = await AddressShops.find({ city: body.cityId });
+      let result = await models.AddressShops.find({ city: body.cityId });
       res.end(JSON.stringify(result));
     },
   },

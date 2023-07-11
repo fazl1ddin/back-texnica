@@ -1,5 +1,15 @@
 const Mongoose = require("mongoose");
 
+const times = {
+  type: [Number],
+  validate: {
+    validator: (arr) => {
+      return arr.length === 2 && arr.every((item) => item <= 24 && item > 0) && arr[0] < arr[1]
+    },
+    message: "Array length must be 2",
+  },
+}
+
 module.exports = {
   Users: new Mongoose.Schema({
     name: String,
@@ -92,17 +102,7 @@ module.exports = {
         href: null | String,
         with: null | Number,
       },
-    ],
-    daysToDeliv: [Number],
-    timeToDeliv: {
-      type: [Number],
-      validate: {
-        validator: (arr) => {
-          return arr.length === 2 && arr.every((item) => item <= 24 && item > 0) && (arr[0] < arr[1])
-        },
-        message: 'Array length must be 2'
-      },
-    }
+    ]
   }),
   AddressShops: new Mongoose.Schema({
     city: String,
@@ -117,19 +117,14 @@ module.exports = {
         message: "Array length must be 2",
       },
     },
-    times: {
-      type: [Number],
-      validate: {
-        validator: (arr) => {
-          return (
-            arr.length === 2 && arr.every((item) => item <= 24 && item > 0)
-          );
-        },
-        message: "Array length must be 2",
-      },
-    },
+    times: times
   }),
   Cities: new Mongoose.Schema({
     name: String,
   }),
+  DaysToDeliv: new Mongoose.Schema({
+    date: Number,
+    times: times,
+    isPay: Boolean
+  })
 };

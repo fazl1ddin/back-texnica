@@ -1,12 +1,6 @@
-const mongoose = require('mongoose')
-const { Users, Products, News, Promos, Customs, AddressShops, Cities } = require('../schemas/index.cjs')
+const mongoose = require("mongoose");
+const schemas = require("../schemas/index.cjs");
 
-module.exports = {
-    Users: mongoose.model('Users', Users),
-    Products: mongoose.model('Products', Products),
-    News: mongoose.model('News', News),
-    Promos: mongoose.model('Promos', Promos),
-    Customs: mongoose.model("Customs", Customs),
-    AddressShops: mongoose.model("AddressShops", AddressShops),
-    Cities: mongoose.model("Cities", Cities)
-}
+module.exports = Object.fromEntries(Object.entries(schemas).map(([key, value], index) => {
+  return [key, mongoose.model(key, value)]
+}))
