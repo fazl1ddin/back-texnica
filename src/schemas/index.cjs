@@ -7,7 +7,7 @@ const times = {
       return arr.length === 2 && arr.every((item) => item <= 24 && item > 0) && arr[0] < arr[1]
     },
     message: "Array length must be 2",
-  },
+  }
 }
 
 module.exports = {
@@ -124,7 +124,11 @@ module.exports = {
   }),
   DaysToDeliv: new Mongoose.Schema({
     date: Number,
-    times: times,
-    isPay: Boolean
+    times: [
+      {
+        time: times,
+        isFree: Boolean
+      }
+    ]
   })
 };
