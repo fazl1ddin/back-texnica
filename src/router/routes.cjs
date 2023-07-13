@@ -334,6 +334,7 @@ module.exports = [
   },
   fns.getAny("cities", models.Cities),
   fns.getAny("days-deliv", models.DaysToDeliv),
+  fns.getAny("type-pays", models.TypePay),
   {
     method: "post",
     path: "/address-shops",

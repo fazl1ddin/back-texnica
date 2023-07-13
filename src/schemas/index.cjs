@@ -130,5 +130,9 @@ module.exports = {
         isFree: Boolean
       }
     ]
+  }),
+  TypePay: new Mongoose.Schema({
+    name: String,
+    isCash: Boolean
   })
 };
