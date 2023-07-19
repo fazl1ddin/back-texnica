@@ -4,11 +4,15 @@ const times = {
   type: [Number],
   validate: {
     validator: (arr) => {
-      return arr.length === 2 && arr.every((item) => item <= 24 && item > 0) && arr[0] < arr[1]
+      return (
+        arr.length === 2 &&
+        arr.every((item) => item <= 24 && item > 0) &&
+        arr[0] < arr[1]
+      );
     },
     message: "Array length must be 2",
-  }
-}
+  },
+};
 
 module.exports = {
   Users: new Mongoose.Schema({
@@ -102,7 +106,7 @@ module.exports = {
         href: null | String,
         with: null | Number,
       },
-    ]
+    ],
   }),
   AddressShops: new Mongoose.Schema({
     city: String,
@@ -117,7 +121,7 @@ module.exports = {
         message: "Array length must be 2",
       },
     },
-    times: times
+    times: times,
   }),
   Cities: new Mongoose.Schema({
     name: String,
@@ -127,12 +131,63 @@ module.exports = {
     times: [
       {
         time: times,
-        isFree: Boolean
-      }
-    ]
+        isFree: Boolean,
+      },
+    ],
   }),
   TypePay: new Mongoose.Schema({
     name: String,
-    isCash: Boolean
-  })
+    typ: {
+      type: Number,
+      validate: {
+        validator: (item) => item >= 0 && item < 3,
+        // 0 Cash
+        // 1 Credit card
+        // 2 Online
+      },
+    },
+  }),
+  OrdersPick: new Mongoose.Schema({
+    address: {
+      city: String,
+      shop: String,
+    },
+    status: {
+      type: Number,
+      validate: {
+        validator: (item) => item >= 0 && item < 3,
+        // order
+        // pending
+        // delivered
+      },
+    },
+    orderDate: Number,
+    userId: String,
+    getter: {
+      first_name: String,
+      last_name: String,
+      phone_number: String,
+      email: String
+    },
+    price: Number,
+    realPrice: Number,
+    typePay: String,
+    products: [String]
+  }),
+  OrdersDeliv: new Mongoose.Schema({
+    date: String,
+    time: String,
+    street: String,
+    home: String,
+    comment: String,
+    typePay: String,
+    getter: {
+      first_name: String,
+      last_name: String,
+      phone_number: String,
+      email: String
+    },
+    city: String,
+    products: [String]
+  }),
 };

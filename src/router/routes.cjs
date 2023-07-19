@@ -348,5 +348,6 @@ module.exports = [
       res.end(JSON.stringify(result));
     },
   },
+  fns.addAny('order', models.OrdersDeliv),
   ...images,
 ];
