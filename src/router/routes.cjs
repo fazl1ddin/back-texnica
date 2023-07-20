@@ -279,9 +279,28 @@ module.exports = [
           min: sorted[0].price,
           max: sorted[sorted.length - 1].price,
         },
-        podsvetka: removeDuplicates(products, "cruise"),
-        moshnost: removeDuplicates(products, "power"),
-        maksSpeed: removeDuplicates(products, "speed"),
+        podsvetka: {
+          values: removeDuplicates(products, "cruise"),
+          type: 0,
+          title: "Подсветка",
+        },
+        moshnost: {
+          values: removeDuplicates(products, "power"),
+          type: 1,
+          title: "Мощность двигателя (Ватт)",
+        },
+        maksSpeed: {
+          values: removeDuplicates(products, "speed"),
+          type: 1,
+          title: "Максимальная скорость (км/ч)",
+        },
+        typeP: {
+          values: removeDuplicates(products, "typeP"),
+          type: 1,
+          title: "Type",
+        },
+        // 0 radio
+        // 1 checkbox
       };
       res.end(JSON.stringify(filtersChecks));
     },
