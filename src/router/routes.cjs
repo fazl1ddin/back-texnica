@@ -53,13 +53,15 @@ module.exports = [
       if (logType === "pass") {
         const phone = parseInt(obj.iden.replace("+", ""));
         if (!isNaN(phone)) {
-          await models.Users.findOne({ phone: phone, password: obj.password }).then(
-            (result) => (user = result)
-          );
+          await models.Users.findOne({
+            phone: phone,
+            password: obj.password,
+          }).then((result) => (user = result));
         } else {
-          await models.Users.findOne({ mail: obj.iden, password: obj.password }).then(
-            (result) => (user = result)
-          );
+          await models.Users.findOne({
+            mail: obj.iden,
+            password: obj.password,
+          }).then((result) => (user = result));
         }
         if (user != null) {
           const id = user._id.toString();
@@ -126,7 +128,9 @@ module.exports = [
       body = JSON.parse(body);
       let upt;
       let data;
-      await models.Users.findOne({ _id: body.id }).then((result) => (data = result));
+      await models.Users.findOne({ _id: body.id }).then(
+        (result) => (data = result)
+      );
       let arr = [];
       if (body.method === "add") {
         arr = [...data[body.module], body.data];
@@ -166,7 +170,9 @@ module.exports = [
           let arr = [];
           for (let i = 0; i < element.every.length; i++) {
             const item = element.every[i];
-            await models.Products.findById(item).then((result) => (arr[i] = result));
+            await models.Products.findById(item).then(
+              (result) => (arr[i] = result)
+            );
           }
           result[index] = {
             title: element.title,
@@ -188,7 +194,9 @@ module.exports = [
       if (result !== null) {
         for (let index = 0; index < result.length; index++) {
           const element = result[index];
-          await models.Products.findById(element).then((res) => (result[index] = res));
+          await models.Products.findById(element).then(
+            (res) => (result[index] = res)
+          );
         }
         res.end(JSON.stringify(result));
       } else {
@@ -260,7 +268,9 @@ module.exports = [
     method: "get",
     path: "/get-index-promos",
     arrow: async (req, res) => {
-      let result = await models.Customs.find({}).then((res) => res[0]?.indexPromos);
+      let result = await models.Customs.find({}).then(
+        (res) => res[0]?.indexPromos
+      );
       if (result !== null) {
         res.end(JSON.stringify(result));
       } else {
@@ -279,17 +289,17 @@ module.exports = [
           min: sorted[0].price,
           max: sorted[sorted.length - 1].price,
         },
-        podsvetka: {
+        cruise: {
           values: removeDuplicates(products, "cruise"),
           type: 0,
           title: "Подсветка",
         },
-        moshnost: {
+        power: {
           values: removeDuplicates(products, "power"),
           type: 1,
           title: "Мощность двигателя (Ватт)",
         },
-        maksSpeed: {
+        speed: {
           values: removeDuplicates(products, "speed"),
           type: 1,
           title: "Максимальная скорость (км/ч)",
@@ -315,21 +325,13 @@ module.exports = [
       });
       body = JSON.parse(body);
       let filter = {};
-      if (body.filter.podsvetka !== null) {
-        filter = { ...filter, "specification.cruise": body.filter.podsvetka };
-      }
-      if (body.filter.moshnost !== null) {
-        filter = {
-          ...filter,
-          "specification.power": { $in: body.filter.moshnost },
-        };
-      }
-      if (body.filter.maksSpeed !== null) {
-        filter = {
-          ...filter,
-          "specification.speed": { $in: body.filter.podsvetka },
-        };
-      }
+      Object.entries(body.filter).forEach(([key, value], index) => {
+        if (key !== 'prices') {
+          if (value !== null && value.length) {
+            filter = { ...filter, [`specification.${key}`]: { $in: value } };
+          }
+        }
+      });
       if (body.filter.prices.min && body.filter.prices.max) {
         filter = {
           ...filter,
@@ -367,6 +369,6 @@ module.exports = [
       res.end(JSON.stringify(result));
     },
   },
-  fns.addAny('order', models.OrdersDeliv),
+  fns.addAny("order", models.OrdersDeliv),
   ...images,
 ];
