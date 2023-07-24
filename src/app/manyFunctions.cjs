@@ -98,4 +98,27 @@ module.exports = {
             }
         }
     },
+    getDWP(path, model){
+        return {
+          method: "post",
+          path: "/" + path,
+          arrow: async (req, res) => {
+            let body = "";
+            await req.on("data", (chunk) => {
+              body += chunk;
+            });
+            body = JSON.parse(body);
+            let data = await model.find({});
+            res.end(
+              JSON.stringify({
+                data: data.slice(
+                  (body.page - 1) * body.perPage,
+                  body.page * body.perPage
+                ),
+                allength: Math.ceil(data.length / body.perPage),
+              })
+            );
+          },
+        }
+    }
 }

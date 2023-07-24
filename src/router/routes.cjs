@@ -370,5 +370,8 @@ module.exports = [
     },
   },
   fns.addAny("order", models.OrdersDeliv),
+  fns.getDWP('promos', models.Promos),
+  fns.getOne('promo', models.Promos),
+  fns.getDWP('news', models.News),
   ...images,
 ];

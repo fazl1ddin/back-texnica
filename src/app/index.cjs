@@ -36,7 +36,8 @@ module.exports = class App{
                 res.setHeader('Content-Type', 'application/json; charset=utf-8')
             }
             const emitted = this.event.emit(this._getRouteMask(req.url, req.method), req, res)
-            if(!emitted){
+            if (!emitted) {
+                res.statusCode = 404
                 res.end('page not found')
             }
         })
