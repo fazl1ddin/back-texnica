@@ -22,7 +22,8 @@ module.exports = {
                     })
                     await model.create(JSON.parse(body))
                     res.end(JSON.stringify(true))
-                } catch(e){
+                } catch (e) {
+                    console.log(e);
                     res.end(JSON.stringify(false))
                 }
             }

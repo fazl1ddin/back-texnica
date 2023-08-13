@@ -31,4 +31,8 @@ module.exports = class Router{
     delete(path, handler){
         this.request('DELETE', path, handler)
     }
+
+    options(path, handler) {
+        this.request('OPTIONS', path, handler)
+    }
 }

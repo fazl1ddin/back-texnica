@@ -106,19 +106,34 @@ module.exports = [
       await req.on("data", (chunk) => {
         body += chunk;
       });
+      let phone = ''
       const obj = JSON.parse(body);
-      models.Users.create({
+      for (let index = 0; index < obj.phone.length; index++) {
+        const element = obj.phone[index];
+        if(!isNaN(element) && element !== ' ') phone+=element
+      }
+      const user = await models.Users.create({
         ...obj,
+        phone: Number(phone),
         favorites: [],
         cart: [],
         viewed: [],
         compare: [],
       });
-      res.end("true");
+      if (user !== null) {
+        const id = user._id.toString();
+        const token = jwt.sign({ id }, process.env.SECRET_KEY, {
+          expiresIn: "1d",
+        });
+        res.end(JSON.stringify({ token: token, user }));
+      } else {
+        res.statusCode = 401;
+        res.end(JSON.stringify({ message: "Polzovatel ne sozdalsa" }));
+      }
     },
   },
   {
-    method: "put",
+    method: "post",
     path: "/update-user",
     arrow: async (req, res) => {
       let body = "";
@@ -127,10 +142,7 @@ module.exports = [
       });
       body = JSON.parse(body);
       let upt;
-      let data;
-      await models.Users.findOne({ _id: body.id }).then(
-        (result) => (data = result)
-      );
+      let data = await models.Users.findOne({ _id: body.id })
       let arr = [];
       if (body.method === "add") {
         arr = [...data[body.module], body.data];
@@ -369,9 +381,106 @@ module.exports = [
       res.end(JSON.stringify(result));
     },
   },
-  fns.addAny("order", models.OrdersDeliv),
+  {
+    method: 'post',
+    path: '/order-deliv',
+    arrow: async (req, res) => {
+        try{
+            let body = new String
+            await req.on('data', chunk => {
+                body += chunk
+            })
+          await models.OrdersDeliv.create(JSON.parse(body))
+          body = JSON.parse(body)
+          await models.Users.findByIdAndUpdate(body.userId, {
+            cart: []
+          }, { new: true })
+          res.end(JSON.stringify(true))
+        } catch (e) {
+            console.log(e);
+            res.end(JSON.stringify(false))
+        }
+    }
+  },
+  {
+    method: 'post',
+    path: '/order-pick',
+    arrow: async (req, res) => {
+        try{
+            let body = new String
+            await req.on('data', chunk => {
+                body += chunk
+            })
+          await models.OrdersPick.create(JSON.parse(body))
+          body = JSON.parse(body)
+          await models.Users.findByIdAndUpdate(body.userId, {
+            cart: []
+          }, { new: true })
+          res.end(JSON.stringify(true))
+        } catch (e) {
+            console.log(e);
+            res.end(JSON.stringify(false))
+        }
+    }
+  },
   fns.getDWP('promos', models.Promos),
   fns.getOne('promo', models.Promos),
   fns.getDWP('news', models.News),
+  {
+    method: 'post',
+    path: '/update-profile',
+    arrow: async (req, res) => {
+      let body = "";
+      await req.on("data", (chunk) => {
+        body += chunk;
+      });
+      res.end(body)
+      // let data = await models.Users.findOne({ _id: body.id })
+      // let arr = [];
+      // let upt = await models.Users.findOneAndUpdate(
+      //   { _id: body.id },
+      //   body,
+      //   { new: true }
+      // )
+      // res.end(
+      //   JSON.stringify({
+      //     message: "User succesfully updated",
+      //     user: upt,
+      //   })
+      // );
+    },
+  },
+  {
+    method: 'post',
+    path: '/user-orders',
+    arrow: async (req, res) => {
+      let body = ''
+      await req.on('data', chunk => {
+        body += chunk
+      })
+      body = JSON.parse(body)
+      let data1 = await models.OrdersDeliv.find({ userId: body.userId })
+      let data2 = await models.OrdersPick.find({ userId: body.userId })
+      let data = [...data1, ...data2]
+      res.end(
+        JSON.stringify({
+          data: data.slice(
+            (body.page - 1) * body.perPage,
+            body.page * body.perPage
+          ),
+          allength: Math.ceil(data.length / body.perPage),
+          productsL: data.length
+        })
+      );
+    }
+  },
+  {
+    method: 'options',
+    path: '/update-profile',
+    arrow: async (req, res) => {
+      res.statusCode = 200
+      res.end('ok')
+    }
+  },
   ...images,
 ];

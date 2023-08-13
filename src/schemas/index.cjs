@@ -161,21 +161,21 @@ module.exports = {
         // delivered
       },
     },
-    orderDate: Number,
     userId: String,
     getter: {
       first_name: String,
       last_name: String,
       phone_number: String,
-      email: String
+      email: String,
     },
     price: Number,
     realPrice: Number,
     typePay: String,
-    products: [String]
+    products: [String],
+    date: { type: Number, default: Date.now() }
   }),
   OrdersDeliv: new Mongoose.Schema({
-    date: String,
+    dateDeliv: String,
     time: String,
     street: String,
     home: String,
@@ -185,9 +185,11 @@ module.exports = {
       first_name: String,
       last_name: String,
       phone_number: String,
-      email: String
+      email: String,
     },
     city: String,
-    products: [String]
+    userId: String,
+    products: [String],
+    date: { type: Number, default: Date.now() }
   }),
 };
