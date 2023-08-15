@@ -482,5 +482,23 @@ module.exports = [
       res.end('ok')
     }
   },
+  {
+    method: 'post',
+    path: '/change-password',
+    arrow: async (req, res) => {
+      let body = ''
+      await req.on('data', chunk => {
+        body += chunk
+      })
+      body = JSON.parse(body)
+      let oldUser = await models.Users.find({ password: body.oldPassword, userId: body.userId })
+      if (oldUser === null) {
+        res.end('password neverny')
+      } else {
+        let newUser = await models.Users.findById(oldUser._id, {password: body.newPassword})
+        res.end('succesfully updated')
+      }
+    }
+  },
   ...images,
 ];
