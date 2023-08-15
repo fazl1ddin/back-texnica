@@ -106,11 +106,11 @@ module.exports = [
       await req.on("data", (chunk) => {
         body += chunk;
       });
-      let phone = ''
+      let phone = "";
       const obj = JSON.parse(body);
       for (let index = 0; index < obj.phone.length; index++) {
         const element = obj.phone[index];
-        if(!isNaN(element) && element !== ' ') phone+=element
+        if (!isNaN(element) && element !== " ") phone += element;
       }
       const user = await models.Users.create({
         ...obj,
@@ -142,7 +142,7 @@ module.exports = [
       });
       body = JSON.parse(body);
       let upt;
-      let data = await models.Users.findOne({ _id: body.id })
+      let data = await models.Users.findOne({ _id: body.id });
       let arr = [];
       if (body.method === "add") {
         arr = [...data[body.module], body.data];
@@ -338,7 +338,7 @@ module.exports = [
       body = JSON.parse(body);
       let filter = {};
       Object.entries(body.filter).forEach(([key, value], index) => {
-        if (key !== 'prices') {
+        if (key !== "prices") {
           if (value !== null && value.length) {
             filter = { ...filter, [`specification.${key}`]: { $in: value } };
           }
@@ -382,59 +382,67 @@ module.exports = [
     },
   },
   {
-    method: 'post',
-    path: '/order-deliv',
+    method: "post",
+    path: "/order-deliv",
     arrow: async (req, res) => {
-        try{
-            let body = new String
-            await req.on('data', chunk => {
-                body += chunk
-            })
-          await models.OrdersDeliv.create(JSON.parse(body))
-          body = JSON.parse(body)
-          await models.Users.findByIdAndUpdate(body.userId, {
-            cart: []
-          }, { new: true })
-          res.end(JSON.stringify(true))
-        } catch (e) {
-            console.log(e);
-            res.end(JSON.stringify(false))
-        }
-    }
+      try {
+        let body = new String();
+        await req.on("data", (chunk) => {
+          body += chunk;
+        });
+        await models.OrdersDeliv.create(JSON.parse(body));
+        body = JSON.parse(body);
+        await models.Users.findByIdAndUpdate(
+          body.userId,
+          {
+            cart: [],
+          },
+          { new: true }
+        );
+        res.end(JSON.stringify(true));
+      } catch (e) {
+        console.log(e);
+        res.end(JSON.stringify(false));
+      }
+    },
   },
   {
-    method: 'post',
-    path: '/order-pick',
+    method: "post",
+    path: "/order-pick",
     arrow: async (req, res) => {
-        try{
-            let body = new String
-            await req.on('data', chunk => {
-                body += chunk
-            })
-          await models.OrdersPick.create(JSON.parse(body))
-          body = JSON.parse(body)
-          await models.Users.findByIdAndUpdate(body.userId, {
-            cart: []
-          }, { new: true })
-          res.end(JSON.stringify(true))
-        } catch (e) {
-            console.log(e);
-            res.end(JSON.stringify(false))
-        }
-    }
+      try {
+        let body = new String();
+        await req.on("data", (chunk) => {
+          body += chunk;
+        });
+        await models.OrdersPick.create(JSON.parse(body));
+        body = JSON.parse(body);
+        await models.Users.findByIdAndUpdate(
+          body.userId,
+          {
+            cart: [],
+          },
+          { new: true }
+        );
+        res.end(JSON.stringify(true));
+      } catch (e) {
+        console.log(e);
+        res.end(JSON.stringify(false));
+      }
+    },
   },
-  fns.getDWP('promos', models.Promos),
-  fns.getOne('promo', models.Promos),
-  fns.getDWP('news', models.News),
+  fns.getDWP("promos", models.Promos),
+  fns.getOne("promo", models.Promos),
+  fns.getDWP("news", models.News),
   {
-    method: 'post',
-    path: '/update-profile',
+    method: "post",
+    path: "/update-profile",
     arrow: async (req, res) => {
       let body = "";
       await req.on("data", (chunk) => {
         body += chunk;
       });
-      res.end(body)
+      res.end(body);
       // let data = await models.Users.findOne({ _id: body.id })
       // let arr = [];
       // let upt = await models.Users.findOneAndUpdate(
@@ -451,17 +459,17 @@ module.exports = [
     },
   },
   {
-    method: 'post',
-    path: '/user-orders',
+    method: "post",
+    path: "/user-orders",
     arrow: async (req, res) => {
-      let body = ''
-      await req.on('data', chunk => {
-        body += chunk
-      })
-      body = JSON.parse(body)
-      let data1 = await models.OrdersDeliv.find({ userId: body.userId })
-      let data2 = await models.OrdersPick.find({ userId: body.userId })
-      let data = [...data1, ...data2]
+      let body = "";
+      await req.on("data", (chunk) => {
+        body += chunk;
+      });
+      body = JSON.parse(body);
+      let data1 = await models.OrdersDeliv.find({ userId: body.userId });
+      let data2 = await models.OrdersPick.find({ userId: body.userId });
+      let data = [...data1, ...data2];
       res.end(
         JSON.stringify({
           data: data.slice(
@@ -469,36 +477,42 @@ module.exports = [
             body.page * body.perPage
           ),
           allength: Math.ceil(data.length / body.perPage),
-          productsL: data.length
+          productsL: data.length,
         })
       );
-    }
+    },
   },
   {
-    method: 'options',
-    path: '/update-profile',
+    method: "options",
+    path: "/update-profile",
     arrow: async (req, res) => {
-      res.statusCode = 200
-      res.end('ok')
-    }
+      res.statusCode = 200;
+      res.end("ok");
+    },
   },
   {
-    method: 'post',
-    path: '/change-password',
+    method: "post",
+    path: "/change-password",
     arrow: async (req, res) => {
-      let body = ''
-      await req.on('data', chunk => {
-        body += chunk
-      })
-      body = JSON.parse(body)
-      let oldUser = await models.Users.find({ password: body.oldPassword, userId: body.userId })
-      if (oldUser.length) {
-        res.end('password neverny')
+      let body = "";
+      await req.on("data", (chunk) => {
+        body += chunk;
+      });
+      body = JSON.parse(body);
+      let oldUser = await models.Users.findById(body.userId);
+      if (oldUser) {
+        res.end('polzovatel ne naydyon')
       } else {
-        let newUser = await models.Users.findById(oldUser._id, {password: body.newPassword})
-        res.end('succesfully updated')
+        if (oldUser.password === body.oldPassword) {
+          let newUser = await models.Users.findById(oldUser._id, {
+            password: body.newPassword,
+          });
+          res.end("succesfully updated");
+        } else {
+          res.end("password neverny");
+        }
       }
-    }
+    },
   },
   ...images,
 ];
