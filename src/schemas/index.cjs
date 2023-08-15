@@ -169,7 +169,6 @@ module.exports = {
       email: String,
     },
     price: Number,
-    realPrice: Number,
     typePay: String,
     products: [String],
     date: { type: Number, default: Date.now() }
@@ -187,8 +186,19 @@ module.exports = {
       phone_number: String,
       email: String,
     },
+    status: {
+      type: Number,
+      validate: {
+        validator: (item) => item >= 0 && item < 3,
+        // order
+        // pending
+        // delivered
+      },
+      default: 0
+    },
     city: String,
     userId: String,
+    price: Number,
     products: [String],
     date: { type: Number, default: Date.now() }
   }),
