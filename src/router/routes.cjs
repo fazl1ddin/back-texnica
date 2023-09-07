@@ -179,13 +179,7 @@ module.exports = [
       if (result !== null) {
         for (let index = 0; index < result.length; index++) {
           const element = result[index];
-          let arr = [];
-          for (let i = 0; i < element.every.length; i++) {
-            const item = element.every[i];
-            await models.Products.findById(item).then(
-              (result) => (arr[i] = result)
-            );
-          }
+          let arr = await models.Products.find({id: {$in: element.every}})
           result[index] = {
             title: element.title,
             href: element.href,
@@ -225,30 +219,8 @@ module.exports = [
         body += chunk;
       });
       body = JSON.parse(body);
-      let oldProduct = await models.Products.findById(body.productId);
-      let sum = oldProduct.comments.reduce((p, n) => p + n.rate, 0);
-      let product = await models.Products.findByIdAndUpdate(
-        body.productId,
-        {
-          rates: oldProduct.comments.length
-            ? Math.round(
-                (sum + Number(body.rate)) / (oldProduct.comments.length + 1)
-              )
-            : body.rate,
-          comments: [
-            ...oldProduct.comments,
-            {
-              userId: body.userId,
-              rate: body.rate,
-              date: Date.now(),
-              title: body.title,
-              content: body.content,
-            },
-          ],
-        },
-        { new: true }
-      );
-      res.end(JSON.stringify(product));
+      const resp = await models.Comments.create(body)
+      res.end(JSON.stringify(resp))
     },
   },
   {
@@ -260,19 +232,7 @@ module.exports = [
         body += chunk;
       });
       body = JSON.parse(body);
-      let arr = [];
-      for (let index = 0; index < body.userId.length; index++) {
-        const element = body.userId[index];
-        let result = {};
-        let user = await models.Users.findById(element);
-        for (let index = 0; index < body.keys.length; index++) {
-          const element = body.keys[index];
-          if (element !== "password") {
-            result[element] = user[element];
-          }
-        }
-        arr[index] = result;
-      }
+      let arr = await models.Users.find({_id: {$in: body.userId}}).select(body.keys)
       res.end(JSON.stringify(arr));
     },
   },
@@ -512,6 +472,19 @@ module.exports = [
           res.end("password neverny");
         }
       }
+    },
+  },
+  {
+    method: "post",
+    path: "/comments",
+    arrow: async (req, res) => {
+      let body = "";
+      await req.on("data", (chunk) => {
+        body += chunk;
+      });
+      body = JSON.parse(body);
+      let result = await models.Comments.find({ city: body.cityId });
+      res.end(JSON.stringify(result));
     },
   },
   ...images,

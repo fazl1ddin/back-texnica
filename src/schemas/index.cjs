@@ -147,7 +147,7 @@ module.exports = {
       },
     },
   }),
-  OrdersPick: new Mongoose.Schema({
+  Orders: new Mongoose.Schema({
     address: {
       city: String,
       shop: String,
@@ -171,35 +171,35 @@ module.exports = {
     price: Number,
     typePay: String,
     products: [String],
-    date: { type: Number, default: Date.now() }
-  }),
-  OrdersDeliv: new Mongoose.Schema({
+    date: { type: Number, default: Date.now() },
     dateDeliv: String,
     time: String,
     street: String,
     home: String,
     comment: String,
-    typePay: String,
-    getter: {
-      first_name: String,
-      last_name: String,
-      phone_number: String,
-      email: String,
-    },
-    status: {
+    city: String,
+    type: {
       type: Number,
       validate: {
-        validator: (item) => item >= 0 && item < 3,
+        validator: (item) => item >= 0 && item < 2,
         // order
         // pending
         // delivered
       },
-      default: 0
+      required: true,
     },
-    city: String,
+  }),
+  Comments: new Mongoose.Schema({
     userId: String,
-    price: Number,
-    products: [String],
-    date: { type: Number, default: Date.now() }
+    rate: {
+      type: Number,
+      validate: {
+        validator: (item) => item >= 0 && item < 6,
+      },
+    },
+    date: Number,
+    title: String,
+    content: String,
+    productId: String,
   }),
 };
