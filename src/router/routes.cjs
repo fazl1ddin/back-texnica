@@ -429,17 +429,13 @@ module.exports = [
         body += chunk;
       });
       body = JSON.parse(body);
-      let data1 = await models.OrdersDeliv.find({ userId: body.userId });
-      let data2 = await models.OrdersPick.find({ userId: body.userId });
-      let data = [...data1, ...data2];
+      const data = await models.Orders.find({ userId: body.userId }).skip(body.page * body.perPage).limit(body.perPage);
+      const count = await models.Orders.estimatedDocumentCount()
       res.end(
         JSON.stringify({
-          data: data.slice(
-            (body.page - 1) * body.perPage,
-            body.page * body.perPage
-          ),
-          allength: Math.ceil(data.length / body.perPage),
-          productsL: data.length,
+          data,
+          apl: count / body.perPage,
+          productsL: count,
         })
       );
     },
