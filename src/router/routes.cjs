@@ -179,7 +179,7 @@ module.exports = [
       if (result !== null) {
         for (let index = 0; index < result.length; index++) {
           const element = result[index];
-          let arr = await models.Products.find({id: {$in: element.every}})
+          let arr = await models.Products.find({ _id: { $in: element.every } });
           result[index] = {
             title: element.title,
             href: element.href,
@@ -219,8 +219,8 @@ module.exports = [
         body += chunk;
       });
       body = JSON.parse(body);
-      const resp = await models.Comments.create(body)
-      res.end(JSON.stringify(resp))
+      const resp = await models.Comments.create(body);
+      res.end(JSON.stringify(resp));
     },
   },
   {
@@ -232,7 +232,9 @@ module.exports = [
         body += chunk;
       });
       body = JSON.parse(body);
-      let arr = await models.Users.find({_id: {$in: body.userId}}).select(body.keys)
+      let arr = await models.Users.find({ _id: { $in: body.userId } }).select(
+        body.keys
+      );
       res.end(JSON.stringify(arr));
     },
   },
@@ -461,7 +463,7 @@ module.exports = [
       body = JSON.parse(body);
       let oldUser = await models.Users.findById(body.userId);
       if (oldUser) {
-        res.end('polzovatel ne naydyon')
+        res.end("polzovatel ne naydyon");
       } else {
         if (oldUser.password === body.oldPassword) {
           let newUser = await models.Users.findById(oldUser._id, {
