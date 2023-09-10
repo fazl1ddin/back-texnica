@@ -76,12 +76,11 @@ module.exports = [
       } else {
         try {
           if (jwt.verify(token, process.env.SECRET_KEY, { expiresIn: "1d" })) {
-            await models.Users.findOne({
-              id: jwt.decode(token, { expiresIn: "1d" }),
-            }).then((result) => (user = result));
+            await models.Users.findById(jwt.decode(token, { expiresIn: "1d" }).id).then((result) => (user = result));
             res.end(JSON.stringify({ user }));
           }
         } catch (e) {
+          console.log(e);
           if (e.expiredAt) {
             res.statusCode = 401;
             res.end(
@@ -343,56 +342,6 @@ module.exports = [
       res.end(JSON.stringify(result));
     },
   },
-  {
-    method: "post",
-    path: "/order-deliv",
-    arrow: async (req, res) => {
-      try {
-        let body = new String();
-        await req.on("data", (chunk) => {
-          body += chunk;
-        });
-        await models.OrdersDeliv.create(JSON.parse(body));
-        body = JSON.parse(body);
-        await models.Users.findByIdAndUpdate(
-          body.userId,
-          {
-            cart: [],
-          },
-          { new: true }
-        );
-        res.end(JSON.stringify(true));
-      } catch (e) {
-        console.log(e);
-        res.end(JSON.stringify(false));
-      }
-    },
-  },
-  {
-    method: "post",
-    path: "/order-pick",
-    arrow: async (req, res) => {
-      try {
-        let body = new String();
-        await req.on("data", (chunk) => {
-          body += chunk;
-        });
-        await models.OrdersPick.create(JSON.parse(body));
-        body = JSON.parse(body);
-        await models.Users.findByIdAndUpdate(
-          body.userId,
-          {
-            cart: [],
-          },
-          { new: true }
-        );
-        res.end(JSON.stringify(true));
-      } catch (e) {
-        console.log(e);
-        res.end(JSON.stringify(false));
-      }
-    },
-  },
   fns.getDWP("promos", models.Promos),
   fns.getOne("promo", models.Promos),
   fns.getDWP("news", models.News),
@@ -430,10 +379,10 @@ module.exports = [
       });
       body = JSON.parse(body);
       const data = await models.Orders.find({ userId: body.userId }).skip(body.page * body.perPage).limit(body.perPage);
-      const count = await models.Orders.estimatedDocumentCount()
+      const count = await models.Orders.find({ userId: body.userId }).count()
       res.end(
         JSON.stringify({
-          data,
+          data: data,
           apl: count / body.perPage,
           productsL: count,
         })
