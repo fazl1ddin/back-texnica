@@ -51,7 +51,7 @@ module.exports = [
       const { obj, logType, token } = JSON.parse(body);
       let user;
       if (logType === "pass") {
-        const phone = parseInt(obj.iden.replace("+", ""));
+        const phone = Number(obj.iden.replace("+", ""));
         if (!isNaN(phone)) {
           await models.Users.findOne({
             phone: phone,
@@ -91,7 +91,7 @@ module.exports = [
             );
           } else {
             res.statusCode = 500;
-            res.end("nepredvidennaya oshibka");
+            res.end(JSON.stringify({ message: "nepredvidennaya oshibka" }));
           }
         }
       }
@@ -111,24 +111,53 @@ module.exports = [
         const element = obj.phone[index];
         if (!isNaN(element) && element !== " ") phone += element;
       }
-      const user = await models.Users.create({
-        ...obj,
-        phone: Number(phone),
-        favorites: [],
-        cart: [],
-        viewed: [],
-        compare: [],
-      });
-      if (user !== null) {
-        const id = user._id.toString();
-        const token = jwt.sign({ id }, process.env.SECRET_KEY, {
-          expiresIn: "1d",
+      try {
+        const findphone = await models.Users.findOne({ phone: Number(phone) }).select("phone")
+        const findmail = await models.Users.findOne({ mail: obj.mail }).select("mail")
+        let errors = {
+          setter(key, value) {
+            this[key] = value
+          },
+        }
+        findphone && errors.setter("phone", findphone.phone)
+        findmail && errors.setter("mail", findmail.mail)
+        if (findphone !== null || findmail !== null) throw {
+          message: "Dublicates: " + Object.keys(errors).slice(1).map((item, index, array) => {
+            if (array.length - 1 === index) {
+              return item
+            }
+            return item + ", "
+          }).join(""),
+          errors
+        }
+        const user = await models.Users.create({
+          ...obj,
+          phone: Number(phone),
+          favorites: [],
+          cart: [],
+          viewed: [],
+          compare: [],
         });
-        res.end(JSON.stringify({ token: token, user }));
-      } else {
-        res.statusCode = 401;
-        res.end(JSON.stringify({ message: "Polzovatel ne sozdalsa" }));
+        if (user !== null) {
+          const id = user._id.toString();
+          const token = jwt.sign({ id }, process.env.SECRET_KEY, {
+            expiresIn: "1d",
+          });
+          res.end(JSON.stringify({ token: token, user }));
+        } else {
+          res.statusCode = 401;
+          res.end(JSON.stringify({ message: "Polzovatel ne sozdalsa" }));
+        }
+      } catch (error) {
+        if (error.message) {
+          res.statusCode = 422
+          res.end(JSON.stringify(error))
+        } else {
+          res.statusCode = 500
+          res.end(JSON.stringify({message: "nepredvidennaya oshibka"}))
+        }
       }
+      
     },
   },
   {

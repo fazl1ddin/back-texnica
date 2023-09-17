@@ -17,8 +17,14 @@ const times = {
 module.exports = {
   Users: new Mongoose.Schema({
     name: String,
-    mail: String,
-    phone: Number,
+    mail: {
+      type: String,
+      unique: true
+    },
+    phone: {
+      type: Number,
+      unique: true
+    },
     password: String,
     favorites: Array,
     cart: Array,
